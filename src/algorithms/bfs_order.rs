@@ -41,7 +41,7 @@ impl<'a, G: RandomAccessGraph> Iterator for BfsOrder<'a, G> {
         self.pl.light_update();
         let current_node = match self.queue.pop_front() {
             None => {
-                while self.visited[self.start] {
+                while unsafe { *self.visited.get_unchecked(self.start) } {
                     self.start += 1;
                     if self.start >= self.graph.num_nodes() {
                         self.pl.done();
@@ -55,7 +55,7 @@ impl<'a, G: RandomAccessGraph> Iterator for BfsOrder<'a, G> {
         };
 
         for succ in self.graph.successors(current_node) {
-            if !self.visited[succ] {
+            if unsafe { !*self.visited.get_unchecked(succ) } {
                 self.queue.push_back(succ);
                 self.visited.set(succ as _, true);
             }
