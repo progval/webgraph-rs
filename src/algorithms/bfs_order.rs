@@ -7,7 +7,7 @@ use std::collections::VecDeque;
 pub struct BfsOrder<'a, G: RandomAccessGraph> {
     graph: &'a G,
     pl: ProgressLogger<'static>,
-    visited: BitVec<u64>,
+    visited: Vec<bool>,
     queue: VecDeque<usize>,
     /// If the queue is empty, resume the BFS from that node.
     ///
@@ -27,7 +27,7 @@ impl<'a, G: RandomAccessGraph> BfsOrder<'a, G> {
         BfsOrder {
             graph,
             pl,
-            visited: bitvec![u64, Lsb0; 0; num_nodes],
+            visited: vec![false; num_nodes],
             queue: VecDeque::new(),
             start: 0,
         }
@@ -48,7 +48,7 @@ impl<'a, G: RandomAccessGraph> Iterator for BfsOrder<'a, G> {
                         return None;
                     }
                 }
-                self.visited.set(self.start, true);
+                unsafe { *self.visited.get_unchecked_mut(self.start) = true };
                 self.start
             }
             Some(node) => node,
@@ -57,7 +57,7 @@ impl<'a, G: RandomAccessGraph> Iterator for BfsOrder<'a, G> {
         for succ in self.graph.successors(current_node) {
             if unsafe { !*self.visited.get_unchecked(succ) } {
                 self.queue.push_back(succ);
-                self.visited.set(succ as _, true);
+                unsafe { *self.visited.get_unchecked_mut(succ) = true };
             }
         }
 
