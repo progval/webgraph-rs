@@ -88,7 +88,7 @@ impl<
         O: IndexedDict<Input = usize, Output = usize>,
     > NodeLabelsLender<'succ> for Iterator<'a, BR, O>
 {
-    type Label = Vec<u64>;
+    type Label = Option<u64>;
     type IntoIterator = SeqLabels<'succ, BR>;
 }
 
@@ -136,21 +136,20 @@ pub struct SeqLabels<'a, BR: BitRead<BE> + BitSeek + GammaRead<BE>> {
 }
 
 impl<'a, BR: BitRead<BE> + BitSeek + GammaRead<BE>> std::iter::Iterator for SeqLabels<'a, BR> {
-    type Item = Vec<u64>;
+    type Item = Option<u64>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.reader.get_bit_pos().unwrap() >= self.end_pos {
             return None;
         }
         let num_labels = self.reader.read_gamma().unwrap() as usize;
-        Some(Vec::from_iter(
-            (0..num_labels).map(|_| self.reader.read_bits(self.width).unwrap()),
-        ))
+        assert!(num_labels <= 1, "unexpected num_labels: {num_labels}");
+        Some((0..num_labels).map(|_| self.reader.read_bits(self.width).unwrap()).next())
     }
 }
 
 impl SequentialLabeling for SwhLabels<MmapReaderBuilder, DeserType<'static, EF>> {
-    type Label = Vec<u64>;
+    type Label = Option<u64>;
 
     type Iterator<'node> = Iterator<'node, <MmapReaderBuilder as ReaderBuilder>::Reader<'node>, <EF as DeserializeInner>::DeserType<'node>>
     where
@@ -180,16 +179,15 @@ pub struct RanLabels<BR: BitRead<BE> + BitSeek + GammaRead<BE>> {
 }
 
 impl<BR: BitRead<BE> + BitSeek + GammaRead<BE>> std::iter::Iterator for RanLabels<BR> {
-    type Item = Vec<u64>;
+    type Item = Option<u64>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.reader.get_bit_pos().unwrap() >= self.end_pos {
             return None;
         }
         let num_labels = self.reader.read_gamma().unwrap() as usize;
-        Some(Vec::from_iter(
-            (0..num_labels).map(|_| self.reader.read_bits(self.width).unwrap()),
-        ))
+        assert!(num_labels <= 1, "unexpected num_labels: {num_labels}");
+        Some((0..num_labels).map(|_| self.reader.read_bits(self.width).unwrap()).next())
     }
 }
 
