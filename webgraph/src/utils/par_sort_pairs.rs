@@ -71,10 +71,10 @@ use crate::traits::{BitDeserializer, BitSerializer};
 ///         .into_iter()
 ///         .enumerate()
 ///         .map(|(partition_id, partition)| {
-///             ArcListGraph::new(
+///             webgraph::labels::proj::Left(ArcListGraph::new(
 ///                 num_nodes,
 ///                 partition.into_iter(),
-///             )
+///             ))
 ///             .iter_from(partition_id * num_nodes_per_partition)
 ///             .take(num_nodes_per_partition)
 ///         }),
