@@ -356,8 +356,8 @@ impl ParSortPairs {
             std::mem::swap(&mut unsorted_buffers, &mut thread_state.unsorted_buffers);
 
             let mut partitioned_sorted_pairs = Vec::with_capacity(num_partitions);
-            assert_eq!(thread_state.sorted_pairs.len(), num_partitions);
-            assert_eq!(thread_state.unsorted_buffers.len(), num_partitions);
+            assert_eq!(sorted_pairs.len(), num_partitions);
+            assert_eq!(unsorted_buffers.len(), num_partitions);
             for (partition_id, (mut sorted_pairs, mut buf)) in sorted_pairs.into_iter().zip(unsorted_buffers.into_iter()).enumerate() {
                 let buf_len = buf.len();
                 flush_buffer(presort_tmp_dir.path(), batch_codec, thread_state.worker_id, partition_id, &mut sorted_pairs, &mut buf).context("Could not flush buffer at the end")?;
