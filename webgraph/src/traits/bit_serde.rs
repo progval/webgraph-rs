@@ -105,7 +105,7 @@ impl<E: Endianness, BR: BitRead<E>, S, D: BitDeserializer<E, BR>> BitDeserialize
 /// [`ParSortedLabeledGraph`]: crate::graphs::par_sorted_graph::ParSortedLabeledGraph
 /// [`transpose_labeled_par`]: crate::transform::transpose_labeled_par
 pub trait LabelSerDeser:
-    BitSerializer<NE, BitWriter<NE>, SerType: Clone + Send + Sync + 'static>
+    BitSerializer<NE, BitWriter<NE>, SerType: Send + Sync + 'static>
     + BitDeserializer<
         NE,
         BitReader<NE>,
